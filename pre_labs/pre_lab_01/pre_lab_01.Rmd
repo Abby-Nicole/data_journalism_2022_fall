@@ -120,7 +120,7 @@ Beth Hansher - homemaker
 
 ```{r}
 maryland_winred_contributions %>%
-  group_by(date) %>%
+  group_by(date) %>% 
   summarise(
     count_contribs = n()
   )

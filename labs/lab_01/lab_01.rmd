@@ -1,0 +1,159 @@
+---
+title: "lab_01"
+author: "Derek Willis"
+date: "7/21/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Turn off scientific notation
+options(scipen=999)
+```
+
+## About this lab
+
+To complete this lab, you need to:
+* run existing code as directed (look for **Task**).
+* modify existing code as directed (look for **Task**).
+* write code in empty codeblocks provided to answer questions included (look for **Q**).
+* write out the answer in the form of a complete sentence in the space given (look for **A**).
+When you are finished, commit changes and push to your personal GitHub repo, then submit the URL to this document on ELMS.
+
+Remember to add any new verbs or concepts to your reference notebook!
+
+## Load libraries and establish settings
+
+**Task** Run the codeblock below to load the Tidyverse. To run the codeblock, hit the little green play button in the upper right corner of the gray area (the codeblock) below.
+
+```{r}
+# Load the tidyverse. If you have not installed the tidyverse already, remove the # from the next line and run it first.  
+# install.packages('tidyverse')
+library(tidyverse)
+```
+
+## Load Data
+
+We're going to load the slice of WinRed contribution data from West Virginia.
+
+**Task** Run the codeblock below to load the data, which is contained in an RDS file.
+
+```{r}
+wv_winred_contribs <- read_rds("lab_01.rds")
+```
+
+## Examine Data
+
+**Task** Run the codeblock below to use glimpse to get a sense of the column names, types and sample data.
+**Q1** How many rows and columns does this dataframe have?
+**A1** 13,382 rows and 24 columns
+
+```{r}
+glimpse(wv_winred_contribs)
+```
+
+## Answer questions
+
+**Q2** Which West Virginia city provided the largest number of contributions? How many?
+**A2** Martinsburg with 781 donations
+
+```{r}
+wv_winred_contribs %>%
+  group_by(city) %>%
+  summarise(
+    count_contribs = n(),
+    total_amount = sum(amount),
+    mean_amount = mean(amount),
+    median_amount = median(amount),
+    min_amount = min(amount),
+    max_amount = max(amount)
+  ) %>%
+  arrange(desc(count_contribs))
+
+```
+**Q3** Which West Virginia city accounted for the fewest contributions? How many?
+**A3** There are actually 40 cities in West Virginia that only have one contribution from them. I would say the most notable single vity donation would be the $1000 from Ellenboro.
+
+```{r} 
+wv_winred_contribs %>%
+  group_by(city) %>%
+  summarise(
+    count_contribs = n(),
+    total_amount = sum(amount),
+    mean_amount = mean(amount),
+    median_amount = median(amount),
+    min_amount = min(amount),
+    max_amount = max(amount)
+  ) %>%
+  arrange((count_contribs))
+```
+**Q4** What's your best educated guess to explain why the city identified in question 2 had more contributions compared to the cities identified in question 3? Hint: you won't find the answer in the data, you'll need to do some quick web research. You do not need to write any code for this question, so no codeblock is provided.  
+**A4** While almost all of the cities named for the smallest amount of contributions are small towns, many based in farming, a large factor to the lack of high populations. Many of these locations, Coldwater Creek (for example) used to be quite popular due to a regional clothing brand there. However, Coldwater Creek (the brand) went bankrupt in 2014. People have since moved away and the population dwindled. Martinsburg, however, is a major WV city in the eastern panhandle of the state. It's near Shepherd University, and a fair amount of Martinburg residents commute into the DMV for work. Martinsburg is also in Berkley County which is the third most wealthy county in the state.
+
+**Q5** What recipient got the largest total amount of money? How many contributions did they receive and what was the average donation?
+**A5** The recipent with the largest total amount of money is the Save America Joint Fundraising Committee with a total amount of $66972.89. They recieved 2448 contributions with an average contribution amount of $27.35820670. 
+
+```{r}
+wv_winred_contribs %>%
+  group_by(memo_text) %>%
+  summarise(
+    count_contribs = n(),
+    total_amount = sum(amount),
+    mean_amount = mean(amount),
+    median_amount = median(amount)
+  ) %>%
+  arrange(desc(count_contribs))
+```
+
+**Q6** What is that top recipient and what explains its popularity? Hint: this will require web research, you won't be able to answer this purely from the data set.  You do not need to write any code for this question, so no codeblock is provided.  
+**A6** The Save America Joint Fundraising Committee is the top recipient and was established by former President Donald Trump. It is meant to further the promotion of Trump-backed election projects/ventures/misinformation/candidates.
+
+**Q7**. Produce a summary table that has the following information for West Virginia as a whole (the whole state, not by city):
+* count of contributions
+* total amount of all contributions
+* the average contribution amount
+* the median contribution amount
+* the smallest contribution amount
+* the largest contribution amount
+
+Store it as a variable object called `wv_summary` so that you can examine it with the data viewer. What newsworthy nuggets jump out at you that you could imagine dropping into a news story? Write a few summary sentences with overall findings.
+
+**A7**. I definitely think that $1000 from a single Ellenboro donation is an eye-cathing fact to add to a news story - especially when the average donation for the entire state is $26.66482. For the top 5 organizations with the most contribuitons, they are all national Republican foundations/committees or running for office outside of WV. Since the state is firmly red, there could be a potential story on WV Republicans feeling the need to support out of state or federal campaigns that are more competitive. I think that a populations comparison for the cities with high and low donations could be interesting. Where is the $0.01 donation coming from? How about the $5800? If the median is only $10, where are these larger donations going? What city are they from? The data provides lots of interesting questions that could end up becoming stories.
+
+```{r}
+wv_winred_contribs %>%
+  summarise(
+    count_contribs = n(),
+    total_amount = sum(amount),
+    mean_amount = mean(amount),
+    median_amount = median(amount),
+    min_amount = min(amount),
+    max_amount = max(amount)
+  ) %>%
+  arrange(desc(total_amount))
+```
+```{r}
+wv_summary <- wv_winred_contribs %>%
+  summarise(
+    count_contribs = n(),
+    total_amount = sum(amount),
+    mean_amount = mean(amount),
+    median_amount = median(amount),
+    min_amount = min(amount),
+    max_amount = max(amount)
+  ) %>%
+  arrange(desc(total_amount))
+```
+
+````{r}
+wv_winred_contribs %>%
+  summarise(
+    count_contribs = n(),
+    total_amount = sum(amount),
+    mean_amount = mean(amount),
+    median_amount = median(amount),
+    min_amount = min(amount),
+    max_amount = max(amount)
+  ) %>%
+  arrange(desc(total_amount))
+```
