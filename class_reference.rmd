@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Consider this a personal guide to the commands and functions you will learn. In general, when you come across an R command or function that you want to remember, put it in here along with a description of what it does and when you'd use it.
 
 
-## Things I Learned on Jan. 27
+## Things I Learned on J
 
 The command to set a working directory is setwd(). For example:
 
@@ -53,3 +53,30 @@ ppp_maryland_loans %>%
   arrange(desc(max_loan_amount))
 ```
 
+
+### Interesting Packages
+
+~ library(tidyverse) - The tidyverse is a collection of open source packages for the R programming language introduced by Hadley Wickham and his team that "share an underlying design philosophy, grammar, and data structures" of tidy data
+
+~ library(lubridate) - Lubridate is an R package that makes it easier to work with dates and times. 
+
+### September 19, 2022
+
+### Commands
+
+my_new_variable -> [all the code that summarizes the data]
+
+[name] <- read_csv - Reads CSV file
+
+head(name) - shows headings
+
+summary(name) - summarizes data
+
+colnames(name) - shows column names
+
+glimpse(name) - makes a tibble with all the sorted information
+
+select (name, different name, etc) - only shows these columns
+
+mutate(new column being created = column it was based on) - add a new column based on an existing column; based on a calculation using two existing columns
+   - mutate is not permanent unless you save it to a new variable
