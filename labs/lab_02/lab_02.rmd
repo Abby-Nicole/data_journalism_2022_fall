@@ -1,0 +1,131 @@
+---
+title: "lab_02"
+author: "derek willis"
+date: "8/09/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries and establish settings
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+# Load the tidyverse. If you have not installed the tidyverse already, remove the # from the next line and run it first.  
+# install.packages('tidyverse')
+library(tidyverse)
+library(lubridate)
+```
+
+## Load Data
+
+Let's keep working with the slice of WinRed contribution data from West Virginia.  
+
+```{r}
+wv_winred_contribs <- read_rds("data/lab_02.rds")
+```
+
+## Examine Data
+
+## Answer questions
+
+**Q1** Create a new column that divides the contribution amounts into the following options - less than $10, $10-$25, $26-$50, $51_$100, $101-$500, $501 and up - and calculates how many contributions are in each group. How would you describe the distribution of contributions in a sentence?
+A1. Most of the contributions seem to trend towards the smaller amount groups such as the $10-$25 range and the less than $10 range with the $500+ contributions seemingly being something of an outlier at only 38 instances.
+
+```{r}
+wv_winred_categories <- wv_winred_contribs %>%
+  mutate(
+    amount_category = case_when(
+        amount < 10 ~ "Less than $10",
+        amount >= 10 & amount <= 25 ~ "$10-$25",
+        amount > 25 & amount <= 50 ~ "$26-$50",
+        amount > 50 & amount <= 100 ~ "$51-$100",
+        amount > 100 & amount < 501 ~ "$101-$500",
+        amount >= 501 ~ "$501 and up"
+      )
+  )
+head(wv_winred_categories)
+
+wv_winred_categories %>%
+  group_by(amount_category) %>%
+summarize(
+  count_contribs = n()
+  
+) %>%
+
+arrange(desc(count_contribs))
+
+```
+
+Q2. Which West Virginia donors made the most contributions of less than $10? You'll need to use a combination of columns to get unique donors.  
+A2. The top donor Dr./Rev John Almond who gave a total of 293 contributions of less than $10. The people with the second and third most contributions of less than $10 were Franco Colonna and Betty Blender with 183 and 173 respectively. 
+
+```{r}
+wv_winred_categories <- wv_winred_contribs %>%
+  mutate(
+    amount_category = case_when(
+        amount < 10 ~ "Less than $10",
+        amount >= 10 & amount <= 25 ~ "$10-$25",
+        amount > 25 & amount <= 50 ~ "$26-$50",
+        amount > 50 & amount <= 100 ~ "$51-$100",
+        amount > 100 & amount < 501 ~ "$101-$500",
+        amount >= 501 ~ "$501 and up"
+      )
+  )
+under_10 <- wv_winred_categories %>% filter(amount_category == "Less than $10")
+
+head(under_10) 
+
+under_10 %>%
+  group_by(last_name, first_name, amount_category) %>%
+summarize(
+  count_contribs = n()
+) %>%
+  
+
+arrange(desc(count_contribs))
+
+```
+
+Q3. What questions do the results of Q2 raise in your mind? How could you use the data to explore them? No code here, just your questions.
+A3. My top question involves the Rev. Dr. John Almond and what the distribution is of the 293 contributions. Are they all going to a handful of candidates or is he donating to people all across the country? If he's a Rev. does his church do endorsements? What is compelling these people to give small contributions so often rather than do less freuquent, large donations? ou could organize the data to filter it and only show contributions these top donors gave and see who is recieving what and how much/often.
+
+Q4. Which month saw the most contributions?
+A4. April 2022
+
+```{r}
+
+wv_date <- wv_winred_categories %>% mutate(date=ymd(date))
+
+head(wv_date)
+
+wv_date %>%
+  mutate(month = floor_date(date, "month")) %>%
+  group_by(month) %>%
+  summarise(count_contribs = n()) %>%
+  arrange(desc( count_contribs = n()))
+
+```
+
+Q5. How many contributions of $2,900 - the individual maximum donation - were there, and who did they go to? How many of the recipients are from West Virginia? Do some googling to find out.
+A5. In this data set, there are exactly 6 donations of $2,900. 3 of them went to Carol for Congress, 1 for McKinley for Congress, 1 for Palazzo for Congress and 1 for Zinke for Congress. Palazzo for Congress is based in Mississippi and Zinke for Congress is based in Montana. Carol for Congress and McKinley for Congress are both based in West Virginia.
+
+```{r}
+wv_2900 <- wv_winred_categories %>% filter(amount == "2900")
+
+head(wv_2900) 
+
+wv_2900 %>%
+  group_by(memo_text) %>%
+summarize(
+  count_contribs = n()
+) %>%
+  
+
+arrange(desc(count_contribs))
+
+
+```
