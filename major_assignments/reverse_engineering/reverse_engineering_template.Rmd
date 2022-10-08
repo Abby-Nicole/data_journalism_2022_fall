@@ -1,6 +1,6 @@
 ---
 title: "Reverse Engineering Project"
-author: "Student names here"
+author: "Abby Wallace"
 date: "Date here"
 output:
   html_document:
@@ -14,11 +14,15 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+# Turn off scientific notation
+options(scipen=999)
+
 ```
 
 ## Introduction 
 
-In this notebook, we are reverse engineering the story, [STORY NAME](STORY URL)
+In this notebook, we are reverse engineering the story, [Why Many Americans Don't Vote](https://projects.fivethirtyeight.com/non-voters-poll-2020-election/)
 
 ## Load libraries
 
@@ -26,6 +30,13 @@ Loading required libraries for this analysis.
 
 ```{r echo=FALSE, message=FALSE}
 
+# Load the tidyverse here
+library(tidyverse)
+
+# Load janitor here
+library(janitor)
+
+library(lubridate)
 ```
 
 ## Load and Cleaning Data
@@ -39,7 +50,7 @@ In this section, describe the source of the data, write a basic data dictionary 
 
 # Clean required data and prepare for analysis if needed. 
 
-
+nonvoters_data <- read_csv("data/nonvoters_data.csv")
 ```
 
 ## Sentences to Engineer
@@ -47,16 +58,79 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 ### Sentence 1
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: [Nonvoters were more likely to have lower incomes; to be young; to have lower levels of education; and to say they don’t belong to either political party, which are all traits that square with what we know about people less likely to engage with the political system.]
+
+* **Analysis summary**: I was able to verify 3 of the four likely attributes named above for nonvoters. By providing individual analyses through looking at rare/never voters and the various attributes, we calculated how many people of the sample data fit into those categories and found the total percentage of each each attribute contributes to likely nonvoters. We couldn't verify "young" which is likely due to that phrase being open for interpretation (we used the standard 18-24) and the total data did not have anyone younger than 22.
 
 ```{r}
 # Put code to reverse engineer sentence here
 
 # Display results of code below this codeblock
 
+nonvoters_categories <- nonvoters_data %>%
+  mutate(
+    Q30 = case_when(
+      Q30 >= 3 ~ "neither political party",
+      Q30 == 1 ~ "Republican",
+      Q30 == 2 ~ "Democrat",
+      )) %>%
+  mutate(
+    ppage = case_when(
+      ppage <= 24 ~ "22-24",
+      ppage > 24 ~"older than 24") )
+nonvoters_categories %>%
+  summarize(income_cat, educ, Q30, voter_category, ppage)
+```
+```{r}
+nonvoters_total <- nonvoters_categories %>%
+  group_by(voter_category) %>%
+  filter(voter_category == "rarely/never") %>%
+  summarise(count = n())
+nonvoters_total
+```
+```{r}
+total_nonvoters <- 1451
 ```
 
+```{r}
+nonvoters_party <- nonvoters_categories %>%
+  group_by(Q30,voter_category) %>%
+  filter(voter_category == "rarely/never") %>%
+  summarise(count = n()) %>%
+    mutate(percent = (count/total_nonvoters)*100) %>%
+arrange(desc(percent))
+nonvoters_party
+```
+
+```{r}
+nonvoters_income <- nonvoters_categories %>%
+  group_by(income_cat,voter_category) %>%
+  filter(voter_category == "rarely/never") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/total_nonvoters)*100) %>%
+arrange(desc(percent))
+nonvoters_income
+```
+
+```{r}
+nonvoters_age <- nonvoters_categories %>%
+  group_by(ppage,voter_category) %>%
+  filter(voter_category == "rarely/never") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/total_nonvoters)*100) %>%
+arrange(desc(percent))
+nonvoters_age
+```
+
+```{r}
+nonvoters_edu <- nonvoters_categories %>%
+  group_by(educ,voter_category) %>%
+  filter(voter_category == "rarely/never") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/total_nonvoters)*100) %>%
+arrange(desc(percent))
+nonvoters_edu
+```
 ### Sentence 2
 
 * **Sentence text**: [Paste in sentence to engineer here]
