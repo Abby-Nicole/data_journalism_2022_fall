@@ -150,7 +150,7 @@ ggplot() +
 
 **Q3** Which county has the highest percentage of mail ballots remaining to be counted? Using the `mail_remaining.csv` file in the data folder, calculate the percentage of mail ballots remaining, then map a county map of those percentages. Looking at both the map and the data, are there counties where the candidate currently leading the governor's race could, in theory, change?
 
-**A3** Well, considering the election is already called, there really isn't any way to consider that.
+**A3** Well, considering the election is already called, there really isn't any way to consider that. If I'm reading the map right, I think Baltimore City could theoretically change with the number of ballots that still need to be counted.
 
 ```{r}
 md_mail_in <- read_csv("data/mail_remaining.csv") %>%
@@ -170,7 +170,8 @@ mail_in_remaining
 ```{r}
 mail_in_counties <- mail_in_remaining %>% left_join(md_counties, by=c("geoid"="geoid")) %>%
   mutate(county = if_else(county == "St. Mary's", "Saint Mary's", county)) %>% 
-  mutate(county = if_else(county == "Baltimore", "Baltimore County", county))
+  mutate(county = if_else(county == "Baltimore", "Baltimore County", county)) %>%
+  arrange(desc(remaining_pct))
 mail_in_counties
 ```
 ```{r}
@@ -182,7 +183,7 @@ ggplot() +
 
 **Q4.** Choose your own map adventure! In the data folder I've included county-level results for several other 2022 contests, including the Comptroller, Attorney General and the marijuana legalization amendment. I've also added the 2020 presidential results by county. Using one of the 2022 races that we haven't already used and at least one other contest for comparison, make a county-level map showing what you think is the most interesting aspect of that data, and describe the results in terms of a possible story. You can bring in other data, such as Census information, if you like.
 
-**A4.**  What county contains had the smallest percent difference between Wes Moore's percentage of the total votes in 2022 for governor and Donald Trump's percentage of the total votes in 2020 for president?
+**A4.**  What county contains had the smallest percent difference between Wes Moore's percentage of the total votes in 2022 for governor and Donald Trump's percentage of the total votes in 2020 for president? So for question, I am mostly looking at trying to weave out the swing voter between the presidential election and the governor's race between the two winning candidates. I don't know if a map is a whole lot of help for this question in answering it, but it could make a good corresponding visual. Once again, there's just the handful of counties with drastic percent changes between the two elections, but most of Maryland seems pretty neutral. I would love to talk to swing voters from some of the counties as well as some of the non-drastic one's about why they went Trump to Moore or why they didn't.
 
 ```{r}
 md_pres <- read_csv("data/md_pres_county_20.csv") %>%
