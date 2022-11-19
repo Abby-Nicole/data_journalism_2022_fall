@@ -1,0 +1,113 @@
+---
+title: "Data Analysis"
+author: "Abby Wallace, Lisa Woelfl, Torrence Banks, Noah Ferguson"
+date: "11/11/2022"
+output:
+  html_document:
+    theme: cerulean
+    highlight: pygments
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction 
+
+In this notebook, we are analyzing data from the Maryland Lobbying Registrations. [https://lobby-ethics.maryland.gov/]
+
+## Load libraries
+
+```{r echo=FALSE, message=FALSE}
+# Load the tidyverse here
+library(tidyverse)
+# Load janitor here
+library(janitor)
+library(lubridate)
+library(stringr)
+library(dplyr)
+library(tidyr)
+```
+
+## Load and Cleaning Data
+
+```{r}
+# Loading the dataframes and binding them together
+one <- read_csv("data/registrations(1).csv") %>% clean_names()
+two <- read_csv("data/registrations(2).csv") %>% clean_names()
+three <- read_csv("data/registrations(3).csv") %>% clean_names()
+four<- read_csv("data/registrations(4).csv") %>% clean_names()
+five <- read_csv("data/registrations(5).csv")%>% clean_names()
+six <- read_csv("data/registrations(6).csv")%>% clean_names()
+seven <- read_csv("data/registrations(7).csv")%>% clean_names()
+eight <- read_csv("data/registrations(8).csv")%>% clean_names()
+nine <- read_csv("data/registrations(9).csv")%>% clean_names()
+total_registrations <- rbind(one, two, three, four, five, six, seven, eight, nine)
+write_csv(total_registrations, "data/total_registrations.csv")
+# We cleaned the data in OpenRefine and split the date column
+clean_total_registrations <- read_csv("data/clean_total_registrations.csv")
+clean_total_registrations[c('start', 'end')] <- str_split_fixed(clean_total_registrations$registration_period, '-', 2)
+```
+
+## Basic explorations
+
+```{r}
+glimpse(clean_total_registrations)
+```
+
+From accessing the Maryland Lobbying Registrations website, we downloaded 9 CSVs of registration data points. We then cleaned each individually and binded them together to create a comprehensive cleaned CSV and data set. We added cleaned columns for organization name & employer and split the date column to have a start and end date for the registration. Our comprehensive, cleaned data set includes 26,580 rows and 10 columns including form_id for a registration number, lobbyist_registrant for the name of the lobbyist, clean_lobbyist_registrant for a standardized list of the lobbyists by name, organization_firm for the name of the organization the lobbyist works for, clean_organization_firm for a standardized list of the organizations the lobbyists work for, employer for what company hired the lobbyist, clean_employer for a standardized list of companies that hired their corresponding lobbyist, registration_period for the registration period that lobbyist was registered to lobby on behalf of the company listed, start for the start date of the registration period and end for the end of the registration period. Our earliest listed start date is January 1, 2016 and our most recent listed end date is December 31, 2021.
+
+After we merged the data sets into total_registrations, we exported a CSV file of the information and cleaned the data in OpenRefine. There only remained a handful of names that were formatted slightly differently that we needed to clean before exporting the now cleaned CSV back to RStudio where we created the cleaned name columns and the individual start and end date columns.
+
+Limitations: The dataframe is pretty basic with a small number of columns. That means we will have to cross-reference the Maryland Lobbying Registrations and other external websites if we want to know how much a lobbyist is making or how much an employer is spending on lobbying. The standard dataset doesn't even include the registration matters. For our topical questions such as energy, crime or the environment, we have to download new datasets for every registration matter we're interested in. On the Maryland Lobbying Registrations website, they provide a search tool titled "Registration Matters" where you can search registrations by the category/topic. For our special topics, we're downloading the CSV files from their pre-defined "Energy," "Environment," and "Juvenile Law" categories online. Another limitation is that the earliest data is from 2016, which means we can't look at any trends that surpass 6 years.
+
+To answer most of our questions, we will have to do additional research. For example, we can ask our data for the number of employers and lobbyists in the energy sector and see how that changed over the last few years. To examine how much the top firms make, we have to go back to Maryland Lobbying Registrations and potentially research beyond just the single website.
+
+When looking into the Prince George's County youth curfew question, we won't get clear cut answers from the data alone. Trying to find a connection between the number of lobbyists for matters of juvenile law and the implementation of the curfew will require additional research on our part, but we can ask our data for trends and basic information that can help shape our research.
+
+### Question 1
+
+
+
+* **Question text**: 
+* **Analysis summary**:
+
+
+
+### Question 4
+
+* **Question text**: How did the number of employers and lobbyists in the energy sector change from 2018 to 2022?
+
+Starting with the basic analysis of lobbyist registrations from the energy sector, we want to explore how lobbying efforts have changed in the past years. Follow-up questions include: Which firms had the most employers in our time frame? How much money did the top 3 firms make from employers in the energy sector (in 2022)? Who are their employers? Are they part of fossil fuels, clean energy or others?
+
+**Analysis summary**:
+
+```{r}
+energy_registrations <- read_csv("data/clean_energy-registrations.csv") %>% clean_names()
+energy_registrations[c('start', 'end')] <- str_split_fixed(energy_registrations$registration_period, '-', 2)
+energy_registrations <- energy_registrations %>% 
+  mutate(new_start = as.Date(start, format = "%m/%d/%y")) %>% 
+  mutate(new_end = as.Date(end, format = "%m/%d/%y")) %>% 
+  mutate(start_year = floor_date(new_start, "year"))
+year_energy_registrations <- energy_registrations %>% 
+  group_by(start_year) %>%
+  summarise(count = n_distinct(clean_lobbyist_registrant))
+year_energy_registrations
+employer_energy <- energy_registrations %>% 
+  group_by(clean_organization_firm) %>% 
+  summarise(count = n_distinct(clean_employer)) %>% 
+  arrange(desc(count))
+employer_energy
+  
+```
+
+Firms with most employers: 
+- Compass Government Relations Partners, LLC
+- Perry White Ross & Jacobson
+- Rifkin Weiner Livingston LLC
+
+Research on website
