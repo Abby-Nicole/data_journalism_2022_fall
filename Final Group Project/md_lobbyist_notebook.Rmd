@@ -70,44 +70,183 @@ To answer most of our questions, we will have to do additional research. For exa
 When looking into the Prince George's County youth curfew question, we won't get clear cut answers from the data alone. Trying to find a connection between the number of lobbyists for matters of juvenile law and the implementation of the curfew will require additional research on our part, but we can ask our data for trends and basic information that can help shape our research.
 
 ### Question 1
+* **Question text**: What lobbyist/registrant represents the most employers in our data set?
 
+* **Analysis summary**: The lobbyist that represents the most employers in our data set was Timothy A. Perry. He's been representing employers for 12 years as a member of Perry White Ross Jacobson LLC and served as Chief of Staff to Senate President Thomas V. Mike Miller, Jr., the longest serving State Senate President in United States history. He lives in Baltimore County, Maryland, and has represented 126 distinct employers in our joined data set. He's represented employers such as Stevenson University and AT&T over four of our data cycles. According to a profile written about him in September 2022, he specializes in government relations and serves as a board member of First Fruits Farm, a charitable nonprofit organization that specializes in food services. (https://marquistoplawyers.com/2022/09/16/timothy-perry/)
 
+```{r}
+most_employers <- clean_total_registrations %>% 
+  group_by(lobbyist_registrant) %>%
+  count() %>% 
+  arrange(desc(n))
 
-* **Question text**: 
-* **Analysis summary**:
+```
 
+```{r}
+clean_total_registrations %>% 
+  filter(lobbyist_registrant == "Perry, Timothy  A"
+  )
+```
 
+```{r}
+dupe_employers <- clean_total_registrations %>% 
+   filter(lobbyist_registrant == "Perry, Timothy  A") %>% 
+  count(clean_employer, source = TRUE) %>% 
+  arrange(desc(n))
+```
 
-### Question 4
+```{r}
+distinct_employers <- clean_total_registrations %>% 
+    group_by(lobbyist_registrant, clean_organization_firm, clean_employer) %>% 
+  summarise(
+    count= n_distinct(lobbyist_registrant, clean_organization_firm, clean_employer)
+  ) %>% 
+  ungroup() %>%
+  group_by(lobbyist_registrant) %>% 
+  count() %>% 
+arrange(desc(n))
+```
 
+### Question 3
+* **Question text**: In the months leading up to the September 9th youth curfew in Prince George’s County, was there an increase in the amount of lobbyist registered for matters of juvenile law?
+Revised question: How did the number of Criminal Law Procedure lobbyists registered change after the September 9th youth curfew in Prince George's County? 
+
+* **Analysis summary**: The number of lobbyists that registered on or after September, 01 2021 through August 2022 for Criminal Law Procedure was 25 (24 were from September 2021 to February 2022). From September, 01 2022 through November 2022, there were 19 registered lobbyists for Criminal Law Procedure.I changed the initial question because based on the data that I choose, I didn't see how I would be able to see if there was a month by month increase or decrease. I also noticed that from March 2022 to August 2022, there were only two lobbyists registered during that period of time. So I though that I should create a question that allows me to incorporate more data than just two lobbyists.Now that we know how the number of lobbyists has changed, it would be interesting to conduct more research and see if any of them have a connection to PG County at all. 
+
+Criminal Law Procedure data set
+
+```{r}
+Criminal_Prod<- read_csv("data/CriminalLProd.csv") %>% clean_names()
+Criminal_Prod[c('start', 'end')] <- str_split_fixed(Criminal_Prod$registration_period, '-', 2)
+NewCriminal_Prod <- Criminal_Prod %>% 
+mutate(new_start = as.Date(start, format = "%m/%d/%y")) %>% 
+  mutate(new_end = as.Date(end, format = "%m/%d/%y")) %>% 
+  mutate(start_year = floor_date(new_start, "year")) %>% 
+  group_by(lobbyist_registrant)
+```
+Compare: March2022 through August 2022 to September 2021 to February 2022
+
+```{r}
+SepttoFeb <- NewCriminal_Prod %>% 
+filter(new_start == "2021-11-08" | new_start == "2021-11-01" |
+new_start == "2022-02-08" | new_start == "2022-01-01" | new_start == "2021-12-06" | new_start == "2022-01-12" | new_start == "2022-01-24")
+  
+March22toAug <- NewCriminal_Prod %>% 
+  filter(new_start == "2022-05-18" | new_start == "2022-08-11")
+Sept22toNov <- NewCriminal_Prod %>% 
+  filter(new_start == "2022-11-01" | new_start == "2022-11-07" | new_start == "2022-11-11" | new_start == "2022-11-02")
+```
+
+```{r}
+CountSepttoFeb <- SepttoFeb %>% 
+  group_by(lobbyist_registrant) %>% 
+  summarise(count= n_distinct(lobbyist_registrant))
+CountMarch22toAug <- March22toAug %>% 
+  group_by(lobbyist_registrant) %>% 
+  summarise(count= n_distinct(lobbyist_registrant))
+CountSept22toNov <- Sept22toNov %>% 
+  group_by(lobbyist_registrant) %>% 
+  summarise(count= n_distinct(lobbyist_registrant))
+```
+
+Question 4
 * **Question text**: How did the number of employers and lobbyists in the energy sector change from 2018 to 2022?
 
 Starting with the basic analysis of lobbyist registrations from the energy sector, we want to explore how lobbying efforts have changed in the past years. Follow-up questions include: Which firms had the most employers in our time frame? How much money did the top 3 firms make from employers in the energy sector (in 2022)? Who are their employers? Are they part of fossil fuels, clean energy or others?
 
-**Analysis summary**:
+* **Analysis summary**:
 
 ```{r}
 energy_registrations <- read_csv("data/clean_energy-registrations.csv") %>% clean_names()
 energy_registrations[c('start', 'end')] <- str_split_fixed(energy_registrations$registration_period, '-', 2)
+```
+
+
+```{r}
 energy_registrations <- energy_registrations %>% 
   mutate(new_start = as.Date(start, format = "%m/%d/%y")) %>% 
   mutate(new_end = as.Date(end, format = "%m/%d/%y")) %>% 
-  mutate(start_year = floor_date(new_start, "year"))
+  mutate(start_year = floor_date(new_start, "year")) %>% 
+```
+
+```{r}
 year_energy_registrations <- energy_registrations %>% 
   group_by(start_year) %>%
   summarise(count = n_distinct(clean_lobbyist_registrant))
 year_energy_registrations
+```
+
+```{r}
 employer_energy <- energy_registrations %>% 
   group_by(clean_organization_firm) %>% 
   summarise(count = n_distinct(clean_employer)) %>% 
   arrange(desc(count))
 employer_energy
-  
 ```
 
-Firms with most employers: 
-- Compass Government Relations Partners, LLC
-- Perry White Ross & Jacobson
-- Rifkin Weiner Livingston LLC
+### Question 4
 
-Research on website
+* **Question text**: How did the number of employers and lobbyists registered for "energy" change from 2018 to 2022?
+
+Starting with the basic analysis of lobbyist registrations categorized under the registration matter "energy", we want to explore lobbying efforts in the energy sector. Follow-up questions include: Which firms had the most employers in our time frame? How much money did the top 3 firms make from employers in the energy sector (in 2022)? Who are their employers? Are they part of fossil fuels, clean energy or others?
+
+Limitations: Although the general dataset on registrations goes back to 2016, datasets including the registration matter only go back to 2019. The general dataset also only goes through the end of 2021 while the energy dataset has information through November of 2022.
+
+**Analysis summary**: As our data shows, 106 lobbyists have registered for "energy" in 1019, 132 in 2020, 123 in 2021 and 2022 in 115. One could have assumed that since the climate crisis has been big news in recent years that there would have been more lobbyists, which doesn't seem to be the case. The numbers has been reclining since 2020. Since 2020 was the first pandemic year, there could be a connection. Did employers have less money to spend on lobbying?
+
+Interestingly, while the number of lobbyists declined, the number of employers grew before 2022. In 2019 there were 66 employers, in 2020 88, in 2021 85 and in 2022 there were 78 employers in the registration matter category "energy".
+
+The 3 firms with the most employers registered for energy lobbying since 2019 are:
+- Compass Government Relations Partners, LLC (10 employers)
+- Perry White Ross & Jacobson (8 employers)
+- Rifkin Weiner Livingston LLC (8 employers)
+
+Next steps for this portions inlcude getting new data from the "Maryland Lobbying Registrations"-Website to look through "energy" employers and their spending.
+
+```{r}
+## The dataset has been cleaned in OpenRefine. We clean the names and split the date column, so we have a start and an end date for the registration.
+energy_registrations <- read_csv("data/clean_energy-registrations.csv") %>% clean_names()
+energy_registrations[c('start', 'end')] <- str_split_fixed(energy_registrations$registration_period, '-', 2)
+```
+
+```{r}
+## Then we transform our new colums from characters to dates and create a floor date to make grouping by year possible.
+energy_registrations <- energy_registrations %>% 
+  mutate(new_start = as.Date(start, format = "%m/%d/%y")) %>% 
+  mutate(new_end = as.Date(end, format = "%m/%d/%y")) %>% 
+  mutate(start_year = floor_date(new_start, "year"))
+```
+
+```{r}
+## To make sure we don't count some lobbyists twice in a year (they do sometimes register multiple times for short periods in a year), we use n_distinct.
+year_energy_registrations <- energy_registrations %>% 
+  group_by(start_year) %>%
+  summarise(count = n_distinct(clean_lobbyist_registrant))
+year_energy_registrations
+```
+
+```{r}
+## We repeat the code, only this time we are looking for the number of employers lobbyists registered with.
+year_energy_employers <- energy_registrations %>% 
+  group_by(start_year) %>%
+  summarise(count = n_distinct(clean_employer))
+year_energy_employers
+```
+
+
+```{r}
+## We want to know which firms had the most employers in our timeframe (2019-2022). We grouped by firms, counted employers and arranged the data.
+employer_energy <- energy_registrations %>% 
+  group_by(clean_organization_firm) %>% 
+  summarise(count = n_distinct(clean_employer)) %>% 
+  arrange(desc(count))
+employer_energy
+```
+```{r}
+## Let's see who those firms work for
+top_three <- energy_registrations %>% 
+  filter(clean_organization_firm == c("Compass Government Relations Partners, LLC", "Perry White Ross & Jacobson", "Rifkin Weiner Livingston LLC")) %>% 
+  select(clean_organization_firm, clean_employer) %>% 
+  arrange(clean_organization_firm)
+top_three
+```
