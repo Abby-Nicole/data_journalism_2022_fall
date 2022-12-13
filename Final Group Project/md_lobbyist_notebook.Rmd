@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE)
 In this notebook, we are analyzing data from the Maryland Lobbying Registrations. [https://lobby-ethics.maryland.gov/]
 
 ## Load libraries
-
+Loading required libraries for this analysis.
 ```{r echo=FALSE, message=FALSE}
 # Load the tidyverse here
 library(tidyverse)
@@ -31,33 +31,41 @@ library(lubridate)
 library(stringr)
 library(dplyr)
 library(tidyr)
+library(ggthemes)
 ```
 
 ## Load and Cleaning Data
-
+Load required data
+Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
 ```{r}
 # Loading the dataframes and binding them together
-one <- read_csv("data/registrations(1).csv") %>% clean_names()
-two <- read_csv("data/registrations(2).csv") %>% clean_names()
-three <- read_csv("data/registrations(3).csv") %>% clean_names()
-four<- read_csv("data/registrations(4).csv") %>% clean_names()
-five <- read_csv("data/registrations(5).csv")%>% clean_names()
-six <- read_csv("data/registrations(6).csv")%>% clean_names()
-seven <- read_csv("data/registrations(7).csv")%>% clean_names()
-eight <- read_csv("data/registrations(8).csv")%>% clean_names()
-nine <- read_csv("data/registrations(9).csv")%>% clean_names()
+one <- read_csv("data/registrations_dataset/registrations(1).csv") %>% clean_names()
+two <- read_csv("data/registrations_dataset/registrations(2).csv") %>% clean_names()
+three <- read_csv("data/registrations_dataset/registrations(3).csv") %>% clean_names()
+four<- read_csv("data/registrations_dataset/registrations(4).csv") %>% clean_names()
+five <- read_csv("data/registrations_dataset/registrations(5).csv")%>% clean_names()
+six <- read_csv("data/registrations_dataset/registrations(6).csv")%>% clean_names()
+seven <- read_csv("data/registrations_dataset/registrations(7).csv")%>% clean_names()
+eight <- read_csv("data/registrations_dataset/registrations(8).csv")%>% clean_names()
+nine <- read_csv("data/registrations_dataset/registrations(9).csv")%>% clean_names()
 total_registrations <- rbind(one, two, three, four, five, six, seven, eight, nine)
-write_csv(total_registrations, "data/total_registrations.csv")
+write_csv(total_registrations, "data/registrations_dataset/total_registrations.csv")
 # We cleaned the data in OpenRefine and split the date column
-clean_total_registrations <- read_csv("data/clean_total_registrations.csv")
+clean_total_registrations <- read_csv("data/registrations_dataset/clean_total_registrations.csv")
 clean_total_registrations[c('start', 'end')] <- str_split_fixed(clean_total_registrations$registration_period, '-', 2)
+clean_total_registrations <- clean_total_registrations %>%
+  mutate(start = mdy(start)) %>%
+  mutate(end = mdy(end))
 ```
+**rbind is how you combine multiple dataframes.
 
 ## Basic explorations
 
 ```{r}
 glimpse(clean_total_registrations)
 ```
+Rows: 26,580
+Columns: 10
 
 From accessing the Maryland Lobbying Registrations website, we downloaded 9 CSVs of registration data points. We then cleaned each individually and binded them together to create a comprehensive cleaned CSV and data set. We added cleaned columns for organization name & employer and split the date column to have a start and end date for the registration. Our comprehensive, cleaned data set includes 26,580 rows and 10 columns including form_id for a registration number, lobbyist_registrant for the name of the lobbyist, clean_lobbyist_registrant for a standardized list of the lobbyists by name, organization_firm for the name of the organization the lobbyist works for, clean_organization_firm for a standardized list of the organizations the lobbyists work for, employer for what company hired the lobbyist, clean_employer for a standardized list of companies that hired their corresponding lobbyist, registration_period for the registration period that the lobbyist was registered to lobby on behalf of the company listed, start for the start date of the registration period and end for the end of the registration period. Our earliest listed start date is January 1, 2016 and our most recent listed end date is December 31, 2021.
 
@@ -73,31 +81,41 @@ When looking into the Prince George's County youth curfew question, we won't get
 Our total Maryland Lobbying Registration dataset contains 26,580 rows and 10 columns including information for registration numbers, names of the lobbyists, names of the organizations the lobbyists work for, what companies hired the corresponding lobbyists, the registration period that lobbyists were registered to lobby on behalf of the companies listed, the start date of the registration period and the end of the registration period. Our earliest listed start date is January 1, 2016, and our most recent listed end date is December 31, 2021, from the total registrations information. Through our analysis of the first question, we’ve discovered that the lobbyist that represents the most employers in our data set is Timothy A. Perry. He’s been practicing for 12 years with Perry White Ross Jacobson LLC after working as Chief of Staff to Senate President Thomas V. Mike Miller, Jr. He specializes in government relations. The number of lobbyists registered for Criminal Law Procedure from September 01 2021 through August 2022 was 25. A future area of exploration will be if any of them have a connection to Prince George’s County as their youth curfew to reduce youth crime was implemented this past September. We have also discovered that the number of energy lobbyists has decreased since 2020 despite the assumption that there would be an upward trend in clean and renewable energy. The next step would be to research if the pandemic drew attention away from energy lobbying thus leading to the downward trend in energy lobbyists.
 
 ### Question 1
-* **Question text**: What lobbyist/registrant represents the most employers in our data set?
+* **Question text**: What lobbyist/registrant represents the most employers in our data set? (Most ever, need all data)
 
 * **Analysis summary**: The lobbyist that represents the most employers in our data set was Timothy A. Perry. He's been representing employers for 12 years as a member of Perry White Ross Jacobson LLC and served as Chief of Staff to Senate President Thomas V. Mike Miller, Jr., the longest serving State Senate President in United States history. He lives in Baltimore County, Maryland, and has represented 126 distinct employers in our joined data set. He's represented employers such as Stevenson University and AT&T over four of our data cycles. According to a profile written about him in September 2022, he specializes in government relations and serves as a board member of First Fruits Farm, a charitable nonprofit organization that specializes in food services. (https://marquistoplawyers.com/2022/09/16/timothy-perry/)
 
+Firms with most employers: 
+- Compass Government Relations Partners, LLC
+- Perry White Ross & Jacobson
+- Rifkin Weiner Livingston LLC
+Research on website
+
+In the below block, I counted the number of total employers that each lobbyist represents, then arranged in descending order to see who has the most total employers in the cleaned data set.
 ```{r}
 most_employers <- clean_total_registrations %>% 
   group_by(lobbyist_registrant) %>%
   count() %>% 
   arrange(desc(n))
-
+most_employers
 ```
 
+Here, I filtered for Timothy A. Perry's different employers across each of the data sets to see the different employers he represents. There, I realized that he's represented a lot of the employers over multiple data sets, effectively skewing the above data.
 ```{r}
 clean_total_registrations %>% 
-  filter(lobbyist_registrant == "Perry, Timothy  A"
-  )
+  filter(lobbyist_registrant == "Perry, Timothy  A")
 ```
 
+I used the codeblock below to see which of Perry's employers he's represented over the most datasets. For example, he's represented Anheuser-Busch Companies four different times, which makes the 333 number in the most_employers data set no longer the number I want to see. I want to see how many unique companies each lobbyist represented, and the current code accounts for all of the duplicates instead of each distinct employer.
 ```{r}
 dupe_employers <- clean_total_registrations %>% 
    filter(lobbyist_registrant == "Perry, Timothy  A") %>% 
   count(clean_employer, source = TRUE) %>% 
   arrange(desc(n))
+dupe_employers
 ```
 
+By grouping by lobbyist, organization firm and employer and counting for distinct employers before ungrouping and regrouping by lobbyist, I was able to figure out how many unique employers each lobbyist represents. Perry still leads the way but with a far smaller number than the original data set after all of the duplicate employers were removed. This number better answers the original question that we took from the data, which was who represents the most UNIQUE employers in the combined data set
 ```{r}
 distinct_employers <- clean_total_registrations %>% 
     group_by(lobbyist_registrant, clean_organization_firm, clean_employer) %>% 
@@ -108,6 +126,90 @@ distinct_employers <- clean_total_registrations %>%
   group_by(lobbyist_registrant) %>% 
   count() %>% 
 arrange(desc(n))
+distinct_employers
+```
+### Question 2
+* **Question text**: Who are the top three "gaming" lobbyists with the most clients, as described and categorized by Maryland Lobbying Registrations? How many of the gaming lobbyists are still active after sports betting was by voters November 3, 2020? Who are the top three organizations employing lobbyists and do any of them have locations already within Maryland?
+
+Limitations: Online sports betting was only legalized and began November 23, 2022, so there is not a lot of time to consider the post element. Voters approved legal sports betting in Maryland in November 2020, and state legislators passed bills facilitating wagering in April 2021. In-person legalized sports betting did not actively start until Dececmber 2021. The earliest registration date is November 2019, so we only have about three-to-four years of data.
+
+* **Analysis summary**: I first downloaded the data set provided by Maryland Lobbying Registrations when you set the "Registration Matters" element of the internal search engine to "Gaming." Upon downloading, there were 328 registrations, and I cleaned the names of lobbyists, organization firms and employers using OpenRefine. After downloading the cleaned data set, I uploaded the set to RStudio. Ivan V. Lanier, David H. Carroll, Jr. and Sushant Sidh are the top three lobbyists in Maryland with the most lobbying clients since 2019 with Lanier having 26 registration contracts and Carroll and Sidh both having 13 registration contracts each. Lanier actually founded Greenwill Consulting Group, LLC and operates as the President and Chief Executive Officer where he specializes in Lobbying for energy, medical cannabis, transportation, telecommunications, property and health-care. Carroll is a founder and principal lobbyist for Capitol Strategies, LLC and has a history lobbying on issues such as transportation, energy, gaming, education, health care, tax issues, environmental regulation, telecommunications and procurement. Sidh is also a principal lobbyist for Capitol Strageties, LLC and used to work as a Deputy Chief of Staff to Maryland Governor Parris N. Glendening and spent six years in the administration. There are 261 registration period contracts regarding gaming that were/are active now that sports betting is legal in Maryland from 49 different gaming employers. Sports betting was legalized in November 2020, began in-person in December 2021 and online sports-betting began November 2022. Most of these contracts are approximately one year long. As for gaming employers that have had the most lobbyist contracts since 2019, CBAC Gaming, LLC (Horseshoe Casino) is at the top with 36 registration period contracts with a tie for second place between MGM Resorts International and PPE Casino Resorts Maryland, LLC with 20 each. CBAC Gaming, LLC owns the Horseshoe Casino in Baltimore which is two stories and the second largest casino in Maryland. The Horseshoe Baltimore Casino features a Caesars Sportsbook on the first place which opened in December 2021 and offers all-year round sports betting. MGM Resorts International has a location in National Harbor in Oxon Hill and features a luxury resort, retail, dining, entertainment and casino. MGM National Harbor also has BetMGM Sportsbook & Lounge for sports betting. PPE Casino Resorts Maryland, LLC owns Live! Casino & Hotel Maryland in Hanover which is Maryland's largest casino and boasts a FanDuel Sportsbook center for sports betting.
+
+```{r}
+### I first uploaded the dataset and cleaned the names up, split the registration periods into start and end dates, and changed them to be categorized as dates rather than as characters. Now, I can work with this data set.
+gaming <- read_csv("data/gaming.csv") %>% clean_names()
+gaming[c('start', 'end')] <- str_split_fixed(gaming$registration_period, '-', 2)
+gaming_dates <- gaming %>%
+  mutate(start = mdy(start)) %>%
+  mutate(end = mdy(end))
+gaming_dates
+```
+
+```{r}
+#In order to determine which lobbyists have the most clients, I first group by the lobbyists themselves and count how mant registration period contracts they each have within the data set. Here, I can see that Ivan V. Lanier, David H. Carroll, Jr. and Sushant Sidh are the top three lobbyists in Maryland with Lanier having 26 registration contracts and Carroll and Sidh both having 13 registration contracts each.
+top_gaming <- gaming_dates %>%
+  group_by(lobbyist_registrant, organization_firm) %>%
+  count() %>%
+  arrange(desc(n))
+top_gaming
+```
+```{r}
+# Taking a closer look at Lanier, we can filter the dataset to only include his registrations and count how many registration contracts he has with each organization that employed him. We can see that since 2019, Lanier has worked with 11 different employers as a lobbyist for them with Golden Entertainment and HPSO Investments LLC, T/A Riverboat on the Potomac tied with for Lanier's top client with 4 contracts each.
+lanier_gaming <- gaming_dates %>% filter(lobbyist_registrant == "Lanier, Ivan  V.") %>%
+  count(employer, source = TRUE) %>%
+  arrange(desc(n))
+lanier_gaming
+```
+
+```{r}
+# As for Carroll, we can repeat the process above and see that Carroll has only had four different organizations hire him to be a lobbyist since 2019. Carroll's top employer for lobbying is tied between Atlantic Bingo Supply, Inc and Delta Bingo t/a Daily Double Bingo with four contracts each.
+carroll_gaming <- gaming_dates %>% filter(lobbyist_registrant == "Carroll, Jr., David H.") %>%
+  count(employer, source = TRUE) %>%
+  arrange(desc(n))
+carroll_gaming
+```
+```{r}
+# For our last last lobbyist, we can see that Sidh and Carroll have the exact same history regarding frequency of lobbying and agencies. When we look at our count of lobbyists, their organizations and how many registration periods they have been active for, we can see that Carroll and Sidh work for the same lobbying agency. Perhaps, they are partners which is why their lobbying employment history is the same? Could be something in need of more research.
+sidh_gaming <- gaming_dates %>% filter(lobbyist_registrant == "Sidh, Sushant") %>%
+  count(employer, source = TRUE) %>%
+  arrange(desc(n))
+sidh_gaming
+```
+```{r}
+#As for determining how many contracts are still active, I set the "end" filter for after the day sports betting legally began in Maryland on November 03, 2020. We can see that there are 261 registration period contracts regarding gaming that are still active now that sports betting is legal in Maryland.
+gaming_contracts <- gaming_dates %>%
+  arrange(desc(end)) %>%
+  filter(end >= "2020-11-03")
+gaming_contracts
+```
+```` {r}
+# Of these 261 active contracts, we can see here that they are from 49 different employers with CBAC Gaming, LLC (Horseshoe Casino) having the most active contracts at 27.
+gaming_contracts %>%
+  count(employer, source = TRUE) %>%
+  arrange(desc(n))
+```
+```{r}
+#Taking a step back, we can see how many registration period contracts each gaming employer had since 2019. CBAC Gaming, LLC (Horseshoe Casino) clearly is at the top with 36 registration period contracts with a tie for second place between MGM Resorts International and PPE Casino Resorts Maryland, LLC with 20 each.
+employer_hires <- gaming_dates %>%
+  group_by(employer) %>%
+  count() %>%
+  arrange(desc(n))
+employer_hires
+```
+```{r}
+#To visualize this data, we can use ggplot to illustrate just how many more lobbyists/registration period contracts CBAC Gaming, LLC (Horseshoe Casino) truly had.
+top_hires <- employer_hires %>%
+  head(10)
+top_hires %>%
+  ggplot() +
+   geom_bar(aes(x=reorder(employer,n), weight=n)) +
+   coord_flip() + 
+   theme_economist() +
+   labs(
+     title="Number of Lobbying Periods",
+     y = "Number of Lobbying Registration Periods",
+     x = "Organization Employing Lobbyists",
+     caption = "Maryland Lobbying Registrations")
 ```
 
 ### Question 3
@@ -126,8 +228,9 @@ mutate(new_start = as.Date(start, format = "%m/%d/%y")) %>%
   mutate(new_end = as.Date(end, format = "%m/%d/%y")) %>% 
   mutate(start_year = floor_date(new_start, "year")) %>% 
   group_by(lobbyist_registrant)
+NewCriminal_Prod
 ```
-Compare: March2022 through August 2022 to September 2021 to February 2022
+Compare: March 2022 through August 2022 to September 2021 to February 2022
 
 ```{r}
 SepttoFeb <- NewCriminal_Prod %>% 
@@ -152,8 +255,28 @@ CountSept22toNov <- Sept22toNov %>%
   summarise(count= n_distinct(lobbyist_registrant))
 ```
 
-### Question 4
+The number of lobbyists that registered on or after September, 01 2021 through August 2022 for Criminal Law Procedure was 25 (24 were from September 2021 to February 2022). From September, 01 2022 through November 2022, there were 19 registered lobbyists for Criminal Law Procedure.
 
+I changed the initial question because based on the data that I choose, I didn't see how I would be able to see if there was a month by month increase or decrease. I also noticed that from March 2022 to August 2022, there were only two lobbyists registered during that period of time. So I though that I should create a question that allows me to incorporate more data than just two lobbyists. 
+
+Now that we know how the number of lobbyists has changed, it would be interesting to conduct more research and see if any of them have a connection to PG County at all. 
+
+### To see if if any recent Criminal Law Procedure Lobbyists were previously registered as Criminal Law Procedure Lobbyists: 
+
+```{r}
+CrimRecentReg <- NewCriminal_Prod %>% 
+  filter(lobbyist_registrant == "Amanuel, Yanet" | lobbyist_registrant == "Bellamy, Lorenzo" | lobbyist_registrant == "Carrington, J. Darrell"|lobbyist_registrant == "Ciekot, Ann T." |lobbyist_registrant == "Egan, Ashley" | lobbyist_registrant == "Elliott, Robyn S" | lobbyist_registrant == "Hessler, Therese Marie" | lobbyist_registrant == "Jones, Lisa" | lobbyist_registrant == "Kraska, Martin" | lobbyist_registrant == "Lennig, Dorothy J" | lobbyist_registrant == "Lombardi, Joyce" | lobbyist_registrant == "Malone, Sean R" | lobbyist_registrant == "Manno, Roger" | lobbyist_registrant == "Mansfield, Andrea" | lobbyist_registrant == "McDonough, Caitlin E" | lobbyist_registrant == "Shapiro, Melanie" | lobbyist_registrant == "Tompsett Jr., Thomas R." | lobbyist_registrant == "Weisel, Meredith R." | lobbyist_registrant == "Zeimer, Matan")
+```
+
+### ***New questions Derek edits 12/03:
+For criminal law procedure lobbyists, are there new people among the recent registrants who haven't registered before? Have the registrants changed in other ways compared not just to the most recent period but earlier periods, too? 
+-Most recent = September 2022 to November 2022
+Answer: The most recent criminal law procedure lobbyists registrants that were not previously registered in this category before were Carrington, J. Darrell, Elliott, Robyn S, Hessler, Therese Marie, Lombardi, Joyce, McDonough, Caitlin E, Zeimer, Matan.
+What I did: I went to the Count Sept22 to Nov data set since it already counted the distinct number of registrants from Sep. 2022 to Nov 22. I took the 19 names from that list, filtered them from the initial criminal law procedure data set, and created a new dataframe. Afterwards, I looked through the new CrimeRecentReg data set to see if there were any registrants that did not repeat. 
+Do any of the recently registered criminal procedure lobbyists have the same employers? 
+Some of the recently lobbyists also had the same employer. Both Yanet and Lorenzo had the ACLU of Maryland as their employer. Lisa, Dorthy J, Sean R, Catlin E, and Thomas R had the House of Ruth Maryland as their employer. The only person whose employer was the Jews United for Justice was Matan. People like Kanye West and Kyrie Irving have made the news lately due to Antisemitic posts and remarks that they have made. I think it would be interesting to see if there will or has been an increase in the employers hiring lobbyists (from all lobbyists data) to advocate for the rights of the Jewish community.
+
+### Question 4
 * **Question text**: How did the number of employers and lobbyists registered for "energy" change from 2018 to 2022?
 
 Starting with the basic analysis of lobbyist registrations categorized under the registration matter "energy", we want to explore lobbying efforts in the energy sector. Follow-up questions include: Which firms had the most employers in our time frame? How much money did the top 3 firms make from employers in the energy sector (in 2022)? Who are their employers? Are they part of fossil fuels, clean energy or others?
@@ -169,11 +292,19 @@ The 3 firms with the most employers registered for energy lobbying since 2019 ar
 - Perry White Ross & Jacobson (8 employers)
 - Rifkin Weiner Livingston LLC (8 employers)
 
-Next steps for this portions inlcude getting new data from the "Maryland Lobbying Registrations"-Website to look through "energy" employers and their spending.
+We found that Exxon Mobil Corporation appears as an employer for the first time in 2022. This is already interesting, as Exxon is a huge player in the energy sector nationwide. Further research on the MSEC website shows that Exxon has appeared in different categories on the past, "Environment" and "Others". 
+
+But, according to his report, the lobbyist received $0. In fact, all available activity reports for Exxon indicate that the company has never spent a single dollar on lobbying in Maryland. 
+
+According to Exxon's own 2020 lobbying report, the corporation spent the most in Alaska ($183,000) for "oil and gas issues, policies, and tax legislation". In Texas, Exxon lobbied around alcoholic beverage regulation, education, insurance, labor and malpractice-health care providers. These topics are not directly related to Exxon's business. It could be interesting to look into what Exxon is trying to achieve in Texas and how its lobbying efforts on these issues relate to its business model.
+
+Lobbying report: https://corporate.exxonmobil.com/-/media/Global/Files/policy/lobbying/ExxonMobil_2020-Lobbying-Report.pdf
+
+Further research on the MSEC website shows that Exxon has appeared in different categories on the past, "Environment" and "Others".
 
 ```{r}
 ## The dataset has been cleaned in OpenRefine. We clean the names and split the date column, so we have a start and an end date for the registration.
-energy_registrations <- read_csv("data/clean_energy-registrations.csv") %>% clean_names()
+energy_registrations <- read_csv("data/energy_dataset/clean_energy-registrations.csv") %>% clean_names()
 energy_registrations[c('start', 'end')] <- str_split_fixed(energy_registrations$registration_period, '-', 2)
 ```
 
@@ -201,7 +332,6 @@ year_energy_employers <- energy_registrations %>%
 year_energy_employers
 ```
 
-
 ```{r}
 ## We want to know which firms had the most employers in our timeframe (2019-2022). We grouped by firms, counted employers and arranged the data.
 employer_energy <- energy_registrations %>% 
@@ -218,3 +348,112 @@ top_three <- energy_registrations %>%
   arrange(clean_organization_firm)
 top_three
 ```
+```{r}
+## Now we want find out who has registered for the first time in 2022.
+new_registrants <- energy_registrations %>% 
+  group_by(clean_lobbyist_registrant) %>% 
+  summarise(first = min(start_year)) %>% 
+  filter(first == "2022-01-01")
+new_registrants
+## And who these new registrants work for
+new_registrants_employers <- energy_registrations %>% 
+  group_by(clean_lobbyist_registrant, clean_employer) %>% 
+  summarise(first = min(start_year)) %>% 
+  filter(first == "2022-01-01")
+new_registrants_employers
+## Then we want to know which employers registered for "energy" for the first time in 2022
+new_employers <- energy_registrations %>% 
+  group_by(clean_employer) %>% 
+  summarise(first = min(start_year)) %>% 
+  filter(first == "2022-01-01")
+new_employers
+```
+### Question 5 
+* **Question text**: : Who earned the most money in the latest complete lobbying year (Nov 21 - Oct 22) and which emploeyer spent the most?
+
+In the MSEC activity reports, lobbyists have to report the compensation they have received. The employers state their total expenses.
+
+Limitations: While the data for lobbyist registrations can be filtered by registration matter, the same isn't possible for the activity reports.
+
+**Analysis summary**
+
+Matthew Celentano is by far the top earner for the latest complete lobbying year (Nov 21 - Oct 22). He was compensated over 100 million dollars by the League of Life & Health Insurers of Maryland, Inc. Celentano works for the firm Funk & Bolton, P.A.. According to his LinkedIn profile, he is also the executive director of League of Life, which is a trade association for the insurance industry. (Unsurprisingly, League of Life is the employer that spent the most money in this lobbying year. It's the only employer spending over a million. Second place goes to Constellation Energy Generation, LLC, which spent over $800,000.)
+
+In the years before, Celentano made much less money, between $190,000 and $300,000. We couldn't find any explanations for the sharp rise in the spending of League of Life, which has been paying Celentano for lobbying at least since 2019. There aren't any relevant news stories about League of Life or Celentano. The extremely high amount spent could indicate a simple typo or a bigger story. Either way, this finding is worth investigating.
+
+Overall, 12 lobbyists made over a million, while 174 made less than one thousand dollars, 131 of those were compensated $0.
+
+Maryland Veterinary Medical Association	spent the least money of all employers with just over $18,000.
+
+```{r}
+## The activity reports can't be filtered by energy registrations, but we want to know which lobbyist made the most money in the reporting period November 21 - October 22 and which employer spent the most money on lobbying.
+## We fix the date
+activity_reports <- read_csv("data/activity_reports_dataset/activity_reports_nov_21_oct_22.csv") %>% clean_names()
+activity_reports[c('start', 'end')] <- str_split_fixed(activity_reports$reporting_period, '-', 2)
+activity_reports <- activity_reports %>% 
+  mutate(new_start = as.Date(start, format = "%m/%d/%y")) %>% 
+  mutate(new_end = as.Date(end, format = "%m/%d/%y")) %>% 
+  mutate(start_year = floor_date(new_start, "year"))
+activity_reports
+## And transform the relevant columns to numeric
+clean_activity_reports <- activity_reports %>% 
+  mutate(total_expenses = gsub(",","",total_expenses)) %>% 
+  mutate(total_expenses = str_remove(total_expenses, "[$]")) %>% 
+  mutate(total_expenses = as.numeric(total_expenses)) %>% 
+  mutate(lobbyist_compensation = gsub(",","",lobbyist_compensation)) %>% 
+  mutate(lobbyist_compensation = str_remove(lobbyist_compensation, "[$]")) %>% 
+  mutate(lobbyist_compensation = as.numeric(lobbyist_compensation))
+clean_activity_reports
+## Now we want to see the top earners among the lobbyists
+top_lobbyists <- clean_activity_reports %>% 
+  group_by(lobbyist_registrant) %>% 
+  summarise(lobbyist_compensation = sum(lobbyist_compensation)) %>% 
+  arrange(desc(lobbyist_compensation))
+top_lobbyists
+over_million <- top_lobbyists %>% 
+  filter(lobbyist_compensation > 1000000)
+over_million
+less_thousand <- top_lobbyists %>% 
+  filter(lobbyist_compensation < 1000)
+less_thousand
+zero <- top_lobbyists %>% 
+  filter(lobbyist_compensation == 0)
+zero
+celentano <- clean_activity_reports %>% 
+  filter(lobbyist_registrant == "Celentano, Matthew")
+celentano
+## Now we want to know which employers spend the most money
+top_employers <- clean_activity_reports %>% 
+  group_by(employer) %>% 
+  summarise(total_expenses = sum(total_expenses)) %>% 
+  arrange(desc(total_expenses))
+top_employers
+```
+```{r}
+## Let's take a closer look at Celentano's activity reports
+celentano_reports <- read_csv("data/activity_reports_dataset/celentano_activity_reports.csv") %>% clean_names()
+celentano_reports[c('start', 'end')] <- str_split_fixed(celentano_reports$reporting_period, '-', 2)
+## We fix the dates
+celentano_reports <- celentano_reports %>% 
+  mutate(new_start = as.Date(start, format = "%m/%d/%y")) %>% 
+  mutate(new_end = as.Date(end, format = "%m/%d/%y")) %>% 
+  mutate(start_year = floor_date(new_start, "year"))
+celentano_reports
+## And convert the relevant columns to numeric
+clean_celentano_reports <- celentano_reports %>% 
+  mutate(total_expenses = gsub(",","",total_expenses)) %>% 
+  mutate(total_expenses = str_remove(total_expenses, "[$]")) %>% 
+  mutate(total_expenses = as.numeric(total_expenses)) %>% 
+  mutate(lobbyist_compensation = gsub(",","",lobbyist_compensation)) %>% 
+  mutate(lobbyist_compensation = str_remove(lobbyist_compensation, "[$]")) %>% 
+  mutate(lobbyist_compensation = as.numeric(lobbyist_compensation))
+clean_celentano_reports
+## We want to see how much Celentano reported each year
+clean_celentano_reports %>% 
+  group_by(start_year) %>% 
+  summarise(sum(lobbyist_compensation))
+## When did he start working for League of Life?
+clean_celentano_reports %>% 
+  filter(employer == "League of Life & Health Insurers of Maryland, Inc.")
+```
+We think the most newsworthy finding is that Matthew Celentano is the top earner from the lobbyists. He earned more than $100 million by the League of Life & Health Insurers of Maryland, Inc. It's questionable that he's earned this much as a lobbyist and that an organization is paying that much for an lobbyist. It's also suspicious that Celentano is earning so much from the League of Life as a lobbyist and that he also has an official position there as a Executive Director. We think that this could be worth looking more into if this is not a considered a common business practice.
