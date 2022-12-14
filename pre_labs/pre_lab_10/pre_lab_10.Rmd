@@ -108,7 +108,8 @@ In order to make a map, we need to be able to tell Datawrapper that a certain co
 md_gov_county <- md_gov_county %>%
   clean_names() %>%
   mutate(total = (cox+moore+lashar+wallace+harding+write_ins)) %>%
-  mutate(moore_pct = ((moore/total)*100))
+  mutate(moore_pct = ((moore/total)*100)) %>%
+  arrange(desc(moore_pct))
 
 md_gov_county
 
