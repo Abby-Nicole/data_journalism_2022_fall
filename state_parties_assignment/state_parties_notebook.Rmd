@@ -1,0 +1,306 @@
+---
+title: "State Parties Profile Assignment"
+output: html_notebook
+name: Abby Wallace
+state: Wisconsin
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Introduction 
+
+In this notebook, I am examining the Democratic Party of Wisconsin and the Republican Party of Wisconsin. The data I am using is from the Federal Election Commission and was last downloaded from each respective committee page on Thursday, December 15, 2022. Before I began any coding or analysis provided below, I cleaned all four of the original datasets in OpenRefine by city name, contributor name, contributor employer, contributor occupation, recipient name and recipient city.
+
+### Profile Summary
+
+## Where did and how the state parties get their money, from what kinds of donors, and what did they spent it on?
+For the Democratic Party of Wisconsin, they received 34,555 individual donations between February 12, 2020 and October 19, 2022.
+The state that gave the highest number of individual donations was Wisconsin with 12,376 followed by California with 5,662 and Illinois with 2,449. That being said, the three cities donating the highest dollar amount of money for the Wisconsin Democratic Party were Washington, D.C. with $7557874.45, West Somerville, M.A. with $4951174.04 and Madison, Wisconsin with $2560731.59.
+The top three occupations for donors to the committee were actually people who were not employed at 11,888, individuals who were retired at 2,463, and attorneys with 1,940.
+For the highest dollar amount of money donated to the Wisconsin Democratic Party, the top three were all political action or political party committees with ActBlue, a nonprofit organization that builds tools Democrats count on to run their own small-dollar fundraising programs, which donated $4,951,174.00. In second was the Democratic National Committee which is the governing body of the Democratic Party with $2,252,774.60, and in third with $1,923,832.80 was the Democratic Senatorial Campaign Committee which is the only committee dedicated to electing a Democratic Senate.
+The average donation amount to the Wisconsin Democratic Party was $726.70, and median amount was $50.
+Looking at the top 10 recipients of the Democratic Party of Wisconsin's spending, all but one of them are organizations of some kind except for the first overall which is simply the Democratic Party of Wisconsin - Nonfederal Account at $3,620,304.71. This could be to pay bills, employees, reimbursements, etc. Rippling, the second highest recipient, is a global workforce—from employees' payroll and expenses to computers and apps and received $2,569,298.16. The first actively election-related recipient is Pivot Group in Washington, DC at $2,122,904.22 which is a woman-majority owned firm committed to electing Democrats up and down the ballot.
+
+For the Republican Party of Wisconsin, they received 2,615 individual donations between December 21, 2020 and October 19, 2022.
+The state that gave the highest number of individual donations was Wisconsin with 2,023 followed by Virginia with 104 and California with 87. That being said, the three cities donating the highest dollar amount of money for the Wisconsin Republican Party were Washington, D.C. with $4,261,470.75, Oshkosh, W.I. with $95,3440.42 and Arlington, VA with $294624.51.
+The top three occupations for donors to the committee were actually people who were individuals who were retired at 1,443, business owners with 61 and homemakers with 47.
+For the highest dollar amount of money donated to the Wisconsin Republican Party, the top was the Republican National Committee, which is the governing body of the Republican Party, which donated $2,819,455.00. In second was the actually a recovery of fradulent transfer entry with $1,222,253.20, and in third with $1,089,800.00 was the National Republican Senatorial Committee which is the only committee dedicated to electing a Republican Senate.
+The average donation amount to the Wisconsin Republican Party was $3,476.00, and median amount was $150.00.
+Looking at the top 10 recipients of the Republican Party of Wisconsin's spending, all but one of them are organizations of some kind except for the ninth overall which is an individual named Collin Wojcik. He is the Deputy State Director of the Republican National Committee in Wisconsin. Storytellers Group, LLC comes in first at $1,099,450.00 and is a creative consulting agency. AccountantsWorld, the second highest recipient at $636,334.92, a cloud-based payroll and accounting software for professional accountants. The first actively election-related recipient is the Republican National Committee in Washington, DC with $500,000.00.	
+
+## When you compare the two parties, where are the differences and similarities?
+Some of the similarities I have noticed include that the top location funding both the Wisconsin Republican Party and the Wisconsin Democratic Party is Washington, D.C. Both parties have high numbers of retirees, attorneys, consultants and physicians donating to either of the political committees. Also, Madison, W.I. and Milwaukee, W.I. appear in both the top ten cities donating money to either political party.
+
+As for differences, most of the top ten cities donating to the Wisconsin Democratic Party are outside of Wisconsin while most of the top cities providing donations to the Wisconsin Republican Party are within Wisconsin. Compared to the Democratic Party, the Republican Party of Wisconsin has approximately 30 thousand less donations. However, the median and mean are both much larger than their Democratic counterparts at $150 and $3,476 respectively.
+
+## What did the party committees do, and can you tell much about the strategy behind the spending from the data?
+Both of the party committees used the highest amounts of their funds to pay either the state-level party or national-level party. They also both spent a lot of money on internal management agencies as well as outside organizations to help create content and engagement plans. I have noticed that Democrats appeared to use more agencies designed to specifically help elect Democrats. An example of that would be the Pivot Group in Washington, DC. Looking just at the spending records, I can see where the Committees paid directly for advertising, but, because a lot of the media and promotion strategies go through third-party organizations hired, it is hard to determine what strategies operate to what extent.
+
+## What are the potential stories about their actions might be, and what about either the spending or the donors prompts further questions from you?
+My first idea for a story (that would likely require a lot of reporting) would be on that reimbursement for over $1,000,000 in fraud recovery. What happened? How did the Republican Party of Wisconsin lose that much money? What was the extent of the fraud charges? When did they lose the money? Was it a gradual loss or all at once?
+
+My second major story idea would be that the organization of the Wisconsin Supreme Court was the ninth top donor for the Republican Party of Wisconsin and contributed $100,000.00. If that was in fact from the Wisconsin Supreme Court, did that have any impact on the fall of Roe v. Wade since abortion is now illegal in the state unless the mother's life is in danger? How is allowed for a state supreme court to contribute to a state political party?
+
+An additional curosity I have is simply out of regarding Stacy Schusterman and Lynn Schusterman. They both gave $250,000 to the Wisconsin Democratic Party, and I am curious to see the connection. I am aware that Stacy Schusterman is a billionaire business woman and the daughter of Lynn Schusterman. They are from a family that profitted off of deep-water oil drilling, and the Charles and Lynn Schusterman Family Philanthropies foundation is based in Oklaholma. None of these facts seem to ring true with a Wisconsin-based Democratic Party. I want to know why they both donated.
+
+The first visual I made was a map of the United States and how much each state donated to the Democratic Party of Wisconsin which can be viewed here.
+Link: https://datawrapper.dwcdn.net/7sKCq/1/
+
+The second visual I made was a bar chart of the number of donations to the Republican Party of Wisconsin that fall within the dollar ranges below which can be viewed here.
+Link: https://datawrapper.dwcdn.net/z9f6F/1/
+
+
+### Load libraries
+Loading required libraries for this analysis.
+```{r echo=FALSE, message=FALSE}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(stringr)
+library(dplyr)
+library(tidyr)
+library(ggthemes)
+library(tidycensus)
+```
+
+```{r echo=FALSE}
+census_api_key("6695513daa6ca164f5c88e00366ed052b4a54d4d", overwrite=TRUE)
+```
+
+### Load Datasets
+```{r}
+rep_total_raised <- read_csv("rep_total_raised.csv") %>% clean_names() 
+rep_total_spent <- read_csv("rep_total_spent.csv") %>% clean_names() 
+dem_total_spent <- read_csv("dem_total_spent.csv") %>% clean_names() 
+dem_total_raised <- read_csv("dem_total_raised.csv") %>% clean_names()
+```
+### Basic Explorations
+Looking at the four glimpses below, we can see that there are 34,555 rows of donations to Wisconsin's Democratic Party and 4,322 instances of spending for the state's Democratic Party committee. As for the Republican Party committee, they only had 2,615 donations and 2,709 instances of spending.
+```{r}
+glimpse(dem_total_raised)
+```
+```{r}
+glimpse(rep_total_raised)
+```
+```{r}
+glimpse(dem_total_spent)
+```
+```{r}
+glimpse(rep_total_spent)
+```
+
+How can you describe (broadly) the Democratic Party's donors?
+```{r}
+# I first created a new dataset from the Democratic raised funds CSV containing the columns of interest for this project.
+dem_raised_summary <- dem_total_raised %>%
+  select(report_year, contributor_name, entity_type_desc, contributor_city, contributor_state, contributor_occupation, contribution_receipt_date, contribution_receipt_amount)
+dem_raised_summary
+```
+```{r}
+# I first wanted to see how many contributions were coming out of each state, regardless of the dollar amount attached to it. Here we can see that Wisconsin has the largest number of donations at 14376—which makes sense considering the this is the Democratic party for this state. Next is California with 5662 which is less than half the number of donations compared to Wisconsin. Third is Illinois with 2449.
+dem_donor_state <- dem_raised_summary %>%
+  group_by(contributor_state) %>%
+  count() %>%
+  arrange(desc(n))
+dem_donor_state
+```
+```{r}
+# Now looking at the source of donations and the amount of money coming from each city, we can see that Washington, DC is the city donating the most money to the Democratic Party of Wisconsin, followed my West Somerville, MA. The first Wisconsin city, Madison, comes in at #3 for most money coming in from a city.
+dem_city_state <- dem_raised_summary %>%
+  group_by(contributor_city, contributor_state) %>%
+  summarise(total = (sum(contribution_receipt_amount))) %>%
+  arrange(desc(total))
+dem_city_state
+```
+```{r}
+# Looking only at the listed occupations of the the various donors for the Democratic Party of Wisconsin, the top two positions are actually people not employed or retired. The first listed occupation is actually an attorney. I am surprised to see 939 listed Professors come in fifth overall—considering Madison is the largest Wisconsin town giving donations, I wonder how many of these are University of Wisconsin professors.
+dem_occupation_raised <- dem_raised_summary %>%
+  group_by(contributor_occupation) %>%
+ count() %>%
+  arrange(desc(n)) %>%
+    drop_na()
+dem_occupation_raised
+```
+```{r}
+# For the total most money received from a single contributor, the top 10 donors are primarily political action/political party committees. Three of the top 10 donors are individuals, and two of them share a last name. They could potentially be related. 
+dem_top_ten_donors <- dem_raised_summary %>%
+  group_by(contributor_name, entity_type_desc) %>%
+  summarise(total = (sum(contribution_receipt_amount))) %>%
+  arrange(desc(total)) %>%
+  head(10)
+dem_top_ten_donors
+```
+```{r}
+# Here, I wanted to find out what the median and mean amounts of donations to the Wisconsin Democratic Party were. The median amount is $50 while the average is $726.70. I feel like the median is indicates that many of the donations are smaller amounts, but the mean being so much larger is indicating to me that there are very strong outliers of large amounts. It is also worth noting that some of these numbers are negatives which I believe is a refund of sorts.
+dem_raised_summary %>%
+  group_by(contribution_receipt_amount) %>%
+ summary(mean)
+dem_average_donation <- 726.70
+dem_median_average <- 50.0
+```
+
+How can you describe (broadly) the Republican Party's donors?
+```{r}
+# I first created a new dataset from the Republican raised funds CSV containing the columns of interest for this project.
+rep_raised_summary <- rep_total_raised %>%
+  select(report_year, contributor_name, entity_type_desc, contributor_city, contributor_state, contributor_occupation, contribution_receipt_date, contribution_receipt_amount)
+rep_raised_summary
+```
+```{r}
+# I first wanted to see how many contributions were coming out of each state, regardless of the dollar amount attached to it. Here we can see that Wisconsin has the largest number of donations at 2023—which makes sense considering the this is the Republican party for this state. Next is Virginia with a much smaller number of donations at 104. Third is California with only 87 donations.
+rep_donor_state <- rep_raised_summary %>%
+  group_by(contributor_state) %>%
+  count() %>%
+  arrange(desc(n))
+rep_donor_state
+```
+```{r}
+# Now looking at the source of donations and the amount of money coming from each city, we can see that Washington, DC is the city donating the most money to the Republican Party of Wisconsin (as well as the top city for the Democrats), followed my Oshkosh, WI coming in second. The third city is Arlington, VA which is right outside of Washington, DC. The rest of the top 10 cities are all located in Wisconsin except Naples, FL which comes in at #10. 
+rep_city_state <- rep_raised_summary %>%
+  group_by(contributor_city, contributor_state) %>%
+  summarise(total = (sum(contribution_receipt_amount))) %>%
+  arrange(desc(total)) %>%
+  drop_na()
+rep_city_state
+```
+
+```{r}
+# Looking only at the listed occupations of the the various donors for the Republican Party of Wisconsin, the top position is actually retired coming in at a much higher level than the rest of the listed occupations. Business Owner comes in at second, so people who would be considered self-employed, and homemakers come in at third.
+rep_occupation_raised <- rep_raised_summary %>%
+  group_by(contributor_occupation) %>%
+ count() %>%
+  arrange(desc(n)) %>%
+    drop_na()
+rep_occupation_raised
+```
+```{r}
+# For the total most money received from a single contributor, the top 10 donors are primarily political action/political party committees. Unlike, the Democrats, there is not an individual donor in the top 10. However, I think it is interesting that the Wisconsin Supreme Court appears as a top donor for the Republican Committee. 
+rep_top_ten_donors <- rep_raised_summary %>%
+  group_by(contributor_name, entity_type_desc) %>%
+  summarise(total = (sum(contribution_receipt_amount))) %>%
+  arrange(desc(total)) %>%
+  head(10)
+rep_top_ten_donors
+```
+```{r}
+# Here, I wanted to find out what the median and mean amounts of donations to the Wisconsin Republican Party were. The median amount is $150 while the average is $3476. Compared to the Democratic Party, the Republican Party of Wisconsin has approximately 30 thousand less donations. However, the median and mean are both much larger than their Democratic counterparts at $150 and $3476 respectively. It is also worth noting that some of these numbers are negatives which I believe is a refund of sorts.
+rep_raised_summary %>%
+  group_by(contribution_receipt_amount) %>%
+ summary(mean)
+rep_average_donation <- 3476
+rep_median_donation <- 150
+```
+```{r}
+# With these broad descriptions of the Democratic and Republican parties of Wisconsin, I wanted some insight into the average incomes of the counties of Wisconsin.
+acs <- load_variables(2020, "acs5")
+```
+```{r}
+# With this 2019 data from the American Community Survey. We can see that Milwaukee County and Dane County (home to Madison, WI) are the two counties with the highest estimated income.
+acs_income_2019 <- get_acs(geography = "county",
+variables = c(income = "B01001_001"),
+state = "WI",
+year = 2019)
+acs_income_2019 <- acs_income_2019 %>% arrange(desc(estimate))
+acs_income_2019
+```
+
+
+Do Democrats raise a lot in small amounts or from out of state donors?
+```{r}
+# To get a better understanding of the donation amount distribution, I organized seven different amount bins.
+dem_raised_bins <- dem_raised_summary %>%
+  mutate(
+    amount_category = case_when(
+        contribution_receipt_amount < 10 ~ "Less than $10",
+        contribution_receipt_amount >= 10 & contribution_receipt_amount <= 25 ~ "$10-$25",
+        contribution_receipt_amount > 25 & contribution_receipt_amount <= 50 ~ "$26-$50",
+        contribution_receipt_amount > 50 & contribution_receipt_amount <= 100 ~ "$51-$100",
+        contribution_receipt_amount > 100 & contribution_receipt_amount <= 500 ~ "$101-$500",
+        contribution_receipt_amount > 500 & contribution_receipt_amount <= 1000 ~ "$501-$1000",
+        contribution_receipt_amount > 1000 ~ "Larger than $1000"
+      ))
+dem_raised_bins
+```
+```{r}
+# By looking at the number amount of each amount category, I found that smaller dollar donation amounts make up the majority of Democratic donations with the two least numerous amount categories being larger than $1000 and $501-$1000.
+dem_raised_bins %>%
+  group_by(amount_category) %>%
+ count() %>%
+  arrange(desc(n))
+```
+```{r}
+# Solely looking at the dollar amount totals coming out of each state (for all intents and purposes, DC is a state in this), the most money for the Democratic Party of Wisconsin is coming out of DC, Massachusetts and Wisconsin in that order. This matches the city breakdown from above pretty solidly.
+dem_raised_money_state <- dem_raised_summary %>%
+  group_by(contributor_state) %>%
+   summarise(total = (sum(contribution_receipt_amount))) %>%
+  arrange(desc(total))
+dem_raised_money_state
+write.csv(dem_raised_money_state, "dem_raised_money_state.csv", row.names=FALSE)
+```
+
+Do Republicans raise a lot in small amounts or from out of state donors?
+```{r}
+# To get a better understanding of the donation amount distribution, I organized seven different amount bins.
+rep_raised_bins <- rep_raised_summary %>%
+  mutate(
+    amount_category = case_when(
+        contribution_receipt_amount < 10 ~ "Less than $10",
+        contribution_receipt_amount >= 10 & contribution_receipt_amount <= 25 ~ "$10-$25",
+        contribution_receipt_amount > 25 & contribution_receipt_amount <= 50 ~ "$26-$50",
+        contribution_receipt_amount > 50 & contribution_receipt_amount <= 100 ~ "$51-$100",
+        contribution_receipt_amount > 100 & contribution_receipt_amount <= 500 ~ "$101-$500",
+        contribution_receipt_amount > 500 & contribution_receipt_amount <= 1000 ~ "$501-$1000",
+        contribution_receipt_amount > 1000 ~ "Larger than $1000"
+      ))
+rep_raised_bins
+```
+```{r}
+# By looking at the number amount of each amount category, I found that larger dollar donation amounts make up the majority of Republican donations. The two smallest amount categories are interesting as the second smallest is $501-$1000 then it drops down to Less than $10 for the least numerous.
+rep_only_bins <- rep_raised_bins %>%
+  group_by(amount_category) %>%
+ count() %>%
+  arrange(desc(n))
+rep_only_bins
+write.csv(rep_only_bins, "rep_only_bins.csv", row.names=FALSE)
+```
+```{r}
+# Solely looking at the dollar amount totals coming out of each state (for all intents and purposes, DC is a state in this), the most money for the Democratic Party of Wisconsin is coming out of DC (once again), Wisconsin and Virginia in that order. This matches the city breakdown from above pretty solidly.
+rep_raised_money_state <- rep_raised_summary %>%
+  group_by(contributor_state) %>%
+   summarise(total = (sum(contribution_receipt_amount))) %>%
+  arrange(desc(total)) %>%
+  drop_na()
+rep_raised_money_state
+```
+
+What did the Democratic Party spend its money on?
+```{r}
+# I first summarized the Democratic Party spending into the relevant columns.
+dem_spent_summary <- dem_total_spent %>%
+  select(report_year, recipient_name, entity_type_desc, recipient_state, disbursement_date, disbursement_amount)
+dem_spent_summary
+```
+```{r}
+# Looking at the top 10 recipients of the Democratic Party of Wisconsin's spending, all but one of them are organizations of some kind except for the first overall which is simply the Democratic Party of Wisconsin - Nonfederal Account at $3,620,304.71. This could be to pay bills, employees, reimbursements, etc. Rippling, the second highest recipient, is a global workforce—from employees' payroll and expenses to computers and apps and received $2,569,298.16. The first actively election-related recipient is Pivot Group in Washington, DC at $2,122,904.22 which is a woman-majority owned firm committed to electing Democrats up and down the ballot.
+dem_spent_summary %>%
+ group_by(recipient_name, entity_type_desc, recipient_state) %>%
+  summarise(total = (sum(disbursement_amount))) %>%
+  arrange(desc(total))
+```
+
+What did the Republican Party spend its money on?
+```{r}
+# I first summarized the Republican Party spending into the relevant columns.
+rep_spent_summary <- rep_total_spent %>%
+  select(report_year, recipient_name, entity_type_desc, recipient_state, disbursement_date, disbursement_amount)
+rep_spent_summary
+```
+```{r}
+# Looking at the top 10 recipients of the Republican Party of Wisconsin's spending, all but one of them are organizations of some kind except for the ninth overall which is an individual named Collin Wojcik. He is the Deputy State Director of the Republican National Committee in Wisconsin. Storytellers Group, LLC comes in first at $1,099,450.00 and is a creative consulting agency. AccountantsWorld, the second highest recipient at $636,334.92, a cloud-based payroll and accounting software for professional accountants. The first actively election-related recipient is the Republican National Committee in Washington, DC with $500,000.00.	
+rep_spent_summary %>%
+ group_by(recipient_name, entity_type_desc, recipient_state) %>%
+  summarise(total = (sum(disbursement_amount))) %>%
+  arrange(desc(total))
+```
